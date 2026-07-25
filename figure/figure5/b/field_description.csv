@@ -1,0 +1,18 @@
+Field Name,Type,Unit,Description,Source/Notes
+Date/Time,String,,Timestamp in MM/DD HH:00 format,EnergyPlus hourly output
+STOREY_N:Zone Mean Radiant Temperature,Double,°C,Zone mean radiant temperature (MRT) for storey N,EnergyPlus simulation output — represents longwave radiation from surrounding surfaces
+STOREY_N:Zone Mean Air Dewpoint Temperature,Double,°C,Zone mean air dewpoint temperature for storey N,EnergyPlus simulation output
+STOREY_N:Zone Air Temperature,Double,°C,Zone air dry-bulb temperature (Tdb) for storey N,EnergyPlus simulation output — used as Tdb input in SET calculation
+STOREY_N:Zone Air Humidity Ratio,Double,kg/kg,Zone air humidity ratio for storey N,EnergyPlus simulation output — used with atmospheric pressure to derive RH via Magnus formula
+PEOPLE_SCHEDULE:Schedule Value,Double,,Occupancy schedule fraction (0–1),EnergyPlus schedule input — hourly fraction of occupants present
+LIGHTS_SCHEDULE:Schedule Value,Double,,Lighting schedule fraction (0–1),EnergyPlus schedule input — hourly fraction of lights on
+ELECTRICEQUIPMENT_SCHEDULE:Schedule Value,Double,,Electric equipment schedule fraction (0–1),EnergyPlus schedule input — hourly fraction of equipment in use
+HEATING_SP_SCHEDULE:Schedule Value,Double,°C,Heating setpoint temperature schedule,EnergyPlus schedule input — indoor setpoint during heating season
+COOLING_SP_SCHEDULE:Schedule Value,Double,°C,Cooling setpoint temperature schedule,EnergyPlus schedule input — indoor setpoint during cooling season
+HEATING_PERIOD_SCHEDULE:Schedule Value,Double,,Heating period availability (0–1),EnergyPlus schedule input — calendar on/off for heating season
+COOLING_PERIOD_SCHEDULE:Schedule Value,Double,,Cooling period availability (0–1),EnergyPlus schedule input — calendar on/off for cooling season; figure5-r.py filters hours where COOLING > 0
+HVAC_CONDITIONEDTIME_SCHEDULE:Schedule Value,Double,,HVAC operation availability (0–1),EnergyPlus schedule input — figure5-r.py filters hours where HVAC > 0
+AIREX_CONDITIONEDTIME_SCHEDULE:Schedule Value,Double,,Air exchange operation availability (0–1),EnergyPlus schedule input
+CN_GENERICACTIVITYLEVEL:Schedule Value,Double,W/m²,Occupant activity level schedule,EnergyPlus schedule input — hourly metabolic rate
+HVACTEMPLATE-ALWAYS 4:Schedule Value,Double,,HVAC template constant-on schedule,EnergyPlus template input — fixed at 1
+HVACTEMPLATE-ALWAYS 0:Schedule Value,Double,,HVAC template constant-off schedule,EnergyPlus template input — fixed at 0

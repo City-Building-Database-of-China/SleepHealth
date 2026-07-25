@@ -1,165 +1,365 @@
-# City-building-database-of-China
-
-换成 睡眠 问题
+# SleepHealth: Urban Residential Sleep-Period Thermal Comfort under Climate Change
 
 ## Purpose
 
 The data and code in this repository support the **peer review** of the manuscript submitted to *Nature Climate Change*:
 
-**Fulfilling Spatially Heterogeneous Urban Heating Demand by Climate-Adaptive Electrification**
+**Climate warming not only amplifies cooling demand but also undermines sleep comfort**
 
-They are provided so reviewers and editors can verify methods, reproduce key workflow steps, and inspect city-level inputs and outputs described in the paper.
+The materials are provided so that reviewers and future users can inspect the numerical workflow, reproduce the released Beijing case, and examine the processed source data supporting the manuscript figures.
 
-## Online resources
-
-- **[National prototype building database](http://8.166.131.116/#/)**  
-  Interactive web portal for simulation outputs from the national prototype building database (China Building Energy Model Database).
-
-- **[Shanghai building heating EUI visualization](http://8.138.56.183:8090/webgl/examples/webgl/shanghaiHeating.html)**  
-  WebGL map of Shanghai showing building-level heating energy use intensity (EUI, kWh) by building type.
+This repository contains a **three-stage post-processing pipeline**. It starts from existing EnergyPlus simulation outputs and calculates Standard Effective Temperature (SET), sleep-period thermal-discomfort hours, population-weighted summaries, cooling-energy demand, installed cooling capacity, and coincident cooling peaks. It does not generate EnergyPlus models or execute EnergyPlus simulations.
 
 ## Workflow overview
 
-Building models are produced and simulated through the following pipeline:
+The released computational workflow is:
 
-```
-City GIS inputs  →  GIS2IDF  →  ready IDF  →  EnergyPlus simulation  →  results
+```text
+EnergyPlus simulation outputs used as post-processing inputs
+        ↓
+Step 1: SET and sleep-period thermal-discomfort calculation
+        ↓
+Step 2: Total and per-capita analysis-ready pivot tables
+        ↓
+Step 3: Cooling-energy, installed-capacity, and coincident-peak summaries
 ```
 
 | Stage | Description |
-|-------|-------------|
-| **City GIS inputs** | Building footprints and attributes, local weather, and building-parameter settings. **Replication uses the Prototype sample layers** (see below). |
-| **GIS2IDF** | GIS data are turned into building EnergyPlus models (geometry and associated model setup). |
-| **Ready IDF** | Per-building IDF files prepared for simulation. |
-| **EnergyPlus simulation** | Batch runs using the city weather file(s). |
-| **Results** | Simulation outputs for analysis and comparison with published figures or online visualizations. |
+|---|---|
+| **EnergyPlus simulation outputs** | Hourly indoor-environment outputs, cooling-energy meters, and cooling-capacity reports generated before the public post-processing workflow. |
+| **Step 1** | Reconstructs indoor relative humidity, calculates hourly SET, identifies sleep-period discomfort, and produces population-weighted per-capita results. |
+| **Step 2** | Converts Step 1 outputs into analysis-ready total and per-capita pivot tables. |
+| **Step 3** | Summarizes cooling-energy use, installed capacity, valid cooling hours, and coincident peak cooling loads. |
 
-## Data availability and legal notice
+Only these three computational stages are included in the public code release.
 
-Please note that we are **prohibited** from distributing or uploading the original, precise geospatial datasets to public repositories under the *Surveying and Mapping Law of the People's Republic of China* and relevant national data security regulations.
+## Data availability and public-release scope
 
-In the final published version of this work, explicit longitude and latitude coordinates are stripped from distributed materials. This repository provides a **sample spatial dataset** together with the core simulation scripts.
+The manuscript evaluates six Chinese megacities: Beijing, Shanghai, Guangzhou, Shenzhen, Wuhan, and Xiamen. Owing to data volume and redistribution constraints, the executable public reproduction is provided for **Beijing only**.
 
-Reviewers and future readers can run the code on this sample data to verify the logic and validity of the computational workflow without access to restricted full-resolution survey data.
+The large Beijing EnergyPlus simulation-output package is distributed separately through Zenodo. Processed source data supporting the six-city manuscript figures are retained in this GitHub repository where applicable.
 
-## Data in this repository
+| Material | Public location | Scope |
+|---|---|---|
+| Three-stage post-processing code | GitHub repository | Beijing executable reproduction |
+| EnergyPlus simulation outputs used as post-processing inputs | Zenodo archive | Beijing only |
+| Building and population lookup tables | `code/data/supporting_data/` | Beijing only |
+| Beijing residential-building shapefile | `figure/figure2/c/BJ-shp/` | Beijing only; spatial inspection and source-data transparency |
+| Figure source data | `figure/figure2/`–`figure/figure6/` | Processed tables and files supporting manuscript panels |
+| Rendered manuscript panels | `figure/figure2/`–`figure/figure6/` | Provided for inspection and comparison |
+| Figure plotting scripts | Not distributed | Plotting code is outside the public-release scope |
+| National administrative-boundary shapefiles | Not distributed | Users should obtain authoritative boundary data independently |
 
-Materials are organized for three pilot cities:
+The executable supporting-data directories contain only the Beijing ClusterMap and population inputs. The Beijing residential-building shapefile is provided for spatial inspection and source-data transparency. It is not read by the released three-stage post-processing pipeline. The executable workflow instead uses the ClusterMap and population lookup tables under `code/data/supporting_data/`.
 
-| City | GIS / building data | Weather |
-|------|---------------------|---------|
-| **Nanjing** | Included | Included |
-| **Shanghai** | Included | Included |
-| **Wuhan** | Included | Included |
+Only one copy of the Beijing shapefile should be retained in the final public repository, at `figure/figure2/c/BJ-shp/`. Duplicate copies under other figure folders should be removed before release.
 
-Weather includes baseline and scenario files aligned with each city where applicable.
+## Beijing building data preview
 
-### GIS inputs: Prototype vs CityBuilding
+![Beijing residential building data](beijing_buildings_preview.png)
 
-Two GIS products are provided under `input/GIS/`:
+The image above is a preview of the released Beijing residential-building dataset and is not a manuscript result panel.
 
-| Folder | Role | Use with bundled scripts? |
-|--------|------|---------------------------|
-| **`Prototype/`** | Public-release **sample** building footprints (explicit lon/lat stripped or adjusted). Matches the default paths in `1_GIS2IDF.py`. | **Yes** — use this for replication and peer review. |
-| **`CityBuilding/`** | **Original full-city building GIS** from the study (all buildings per pilot city). Supplied as per-city **ZIP archives** for reference only. | **No** — not used by the default workflow scripts. |
+## Repository layout
 
-**CityBuilding ZIP archives** (under `input/GIS/CityBuilding/`):
-
-| City | Archive |
-|------|---------|
-| Nanjing | `320100_nan2jing1shi4.zip` |
-| Shanghai | `310000_shang4hai3shi4.zip` |
-| Wuhan | `420100_wu3han4shi4.zip` |
-
-**CityBuilding GIS visualizations** (full-city building footprints):
-
-| Nanjing | Shanghai | Wuhan |
-|---------|----------|-------|
-| ![Nanjing city building GIS](input/GIS/CityBuilding/Nan2jing1shi4.png) | ![Shanghai city building GIS](input/GIS/CityBuilding/Shang4hai3shi4.png) | ![Wuhan city building GIS](input/GIS/CityBuilding/Wu3han4shi4.png) |
-
-The archives are **not password-protected**; you can extract them directly with any standard ZIP utility.
-
-These archives preserve the complete building layers used in the paper-scale analyses. They are included for transparency and local inspection; unzip them only if you need to examine the full datasets. **To run `1_GIS2IDF.py` and verify the computational workflow, point the script at shapefiles under `input/GIS/Prototype/`** (e.g. `320100NANJINGSHI.shp`), not at the CityBuilding layers.
-
-### Repository layout
-
-| Path | Contents |
-|------|----------|
-| **`input/GIS/Prototype/`** | Sample building footprints for workflow replication (coordinates adjusted for public release). **Input for `1_GIS2IDF.py`.** |
-| **`input/GIS/CityBuilding/`** | Original full-building city GIS, packaged as the ZIP files listed above. |
-| **`input/EPW/`** | Weather files by city (`NANJING`, `SHANGHAI`, `WUHAN`), including baseline and RCP scenarios. |
-| **`input/Setting/`** | Non-geometry building parameters (`non_geomtry_data_all.xlsx`, `age_de/`). |
-| **`demo/`** | Self-contained **demo package** (sample IDFs + pre-run results); see below. |
-| **`ready_idf/`** | Full-city generated IDF files by city. |
-| **`result/`** | Simulation output folders for full-city or other runs (not used for the bundled demo). |
-
-### Demo package (`demo/`)
-
-A small **end-to-end example** lives under a single top-level folder so reviewers can find inputs and outputs in one place:
-
-```
-demo/
-├── ready_idf/          # three pre-generated IDF files (inputs to simulation)
-│   ├── 320100NANJINGSHI_1.idf
-│   ├── 320100NANJINGSHI_2.idf
-│   └── 320100NANJINGSHI_3.idf
-└── result/             # pre-run EnergyPlus outputs (one subfolder per building)
-    ├── 320100NANJINGSHI_1/
-    ├── 320100NANJINGSHI_2/
-    └── 320100NANJINGSHI_3/
+```text
+SleepHealth/
+├── README.md
+├── requirements.txt
+├── beijing_buildings_preview.png
+├── code/
+│   ├── README.md
+│   ├── run_all.py
+│   ├── code/
+│   │   ├── step1_compute_set.py
+│   │   ├── step2_pivot_tables.py
+│   │   ├── step3_energy_capacity.py
+│   │   ├── config/
+│   │   │   ├── parameters.py
+│   │   │   └── paths.py
+│   │   └── core/
+│   │       ├── city_matcher.py
+│   │       ├── excel_exporter.py
+│   │       └── set_calculator.py
+│   ├── data/
+│   │   ├── energyplus_outputs/
+│   │   │   └── README.md
+│   │   └── supporting_data/
+│   │       ├── ClusterMap/
+│   │       └── Population/
+│   └── output/                         # Generated automatically after execution
+└── figure/
+    ├── figure2/
+    │   └── c/
+    │       └── BJ-shp/                 # Single released Beijing shapefile
+    ├── figure3/
+    ├── figure4/
+    ├── figure5/
+    └── figure6/
 ```
 
-| Location | Contents |
-|----------|----------|
-| **`demo/ready_idf/`** | Three **pre-generated IDF** files for Nanjing prototype buildings, produced by the GIS2IDF workflow from `input/GIS/Prototype/`. |
-| **`demo/result/`** | **Pre-run EnergyPlus results** for the same three buildings. Each subfolder (e.g. `320100NANJINGSHI_1/`) holds standard outputs such as tabular summaries (`.csv`, `Table.htm`), SQLite (`.sql`), and logs (`.err`, `.eio`). |
+The `code/output/` directory is generated automatically and is not required as an input. It may be absent from a fresh clone or retained with an empty placeholder file such as `.gitkeep`.
 
-**How to use the demo**
+The `figure/` directory contains processed figure source data and rendered panels. It does not contain the manuscript plotting scripts.
 
-- **`2_BatchSimulation.py`** defaults to `demo/ready_idf/` → `demo/result/` (weather: `input/EPW/NANJING/Nanjing_2020.epw`). Runtime stays short while exercising the batch script.
-- Open **`demo/result/`** immediately to inspect a successful run, or re-run the batch and compare with the bundled outputs.
-- Full-city ready IDFs remain under `ready_idf/320100NANJINGSHI/`, `ready_idf/310000SHANGHAISHI/`, and `ready_idf/420100WUHANSHI/` when you need more than the three-building demo.
+## External Beijing input archive
 
-## Code organization
+The EnergyPlus simulation outputs required to run the three-stage pipeline are stored separately on Zenodo because of their file size.
 
-Workflow scripts and data folders sit at the **repository root**:
+**Zenodo record:** DOI to be inserted before public release.
+
+After downloading the archive, extract it into:
+
+```text
+code/data/energyplus_outputs/
+```
+
+The final Zenodo package must preserve the exact strategy, city, scenario, and filename structure expected by the released scripts.
+
+### Exact directory names
+
+**Strategy directories**
+
+| Strategy | Directory name |
+|---|---|
+| S1, 2020 baseline | `S1a_2020_Evening27` |
+| S1, future scenarios | `S1b_Future_FixedCap_Evening27` |
+| S2 | `S2_Future_FixedCap_AllDay_32_27` |
+| S3 | `S3_Future_FixedCap_Evening26` |
+| S4 | `S4_Future_FixedCap_AllDay_32_26` |
+| S5 | `S5_Future_AutoSize_AllDay_32_26` |
+
+**City directory**
+
+```text
+bei3jing1shi4/
+```
+
+**Scenario directories**
+
+```text
+2020/
+2040-SSP1-2.6/
+2040-SSP2-4.5/
+2040-SSP5-8.5/
+2060-SSP1-2.6/
+2060-SSP2-4.5/
+2060-SSP5-8.5/
+```
+
+The same strategy, city, and scenario hierarchy must be retained under `IndoorEnv/`, `Energy/`, and `Capacity/`. Directory names and filename suffixes must not be changed after extraction.
+
+| Folder | Contents |
+|---|---|
+| `IndoorEnv/` | Hourly zone air temperature, mean radiant temperature, humidity ratio, and schedule outputs used by Steps 1 and 3 |
+| `Energy/` | Cooling-electricity meter outputs used by Step 3 |
+| `Capacity/` | Cooling-system sizing reports used by Step 3 |
+
+## Core-model organization
 
 | Item | Role |
-|------|------|
-| **`1_GIS2IDF.py`** | Generate ready IDF files from **Prototype** GIS and input settings (default paths). |
-| **`2_BatchSimulation.py`** | Run EnergyPlus in batch on ready IDF files (default: `demo/ready_idf/` → `demo/result/`). |
-| **`demo/`** | Bundled sample IDFs and pre-run simulation results. |
-| **`input/`** | GIS shapefiles, weather (EPW), and building-parameter settings. |
-| **`ready_idf/`** | Full-city generated IDF files. |
-| **`result/`** | Simulation output folders for full-city runs. |
+|---|---|
+| `code/run_all.py` | Runs Steps 1–3 sequentially and stops if a stage fails |
+| `code/code/step1_compute_set.py` | Calculates hourly SET and sleep-period discomfort and performs population-weighted aggregation |
+| `code/code/step2_pivot_tables.py` | Produces analysis-ready total and per-capita pivot tables |
+| `code/code/step3_energy_capacity.py` | Summarizes cooling energy, installed capacity, represented building counts, and coincident peaks |
+| `code/code/config/parameters.py` | Stores fixed SET parameters, sleep-period timestamps, strategies, and scenario definitions |
+| `code/code/config/paths.py` | Resolves repository-relative input and output paths |
+| `code/code/core/` | Shared calculation, city-matching, and Excel-export utilities |
+| `code/data/supporting_data/ClusterMap/` | Beijing building identifiers, prototype assignments, floor counts, and related lookup fields |
+| `code/data/supporting_data/Population/` | Beijing building-level population inputs used for population-weighted aggregation |
 
-## Paths and local configuration
+`Fnum`, `LandNum`, and `Cluster` are read from the ClusterMap table. Population tables contribute building identifiers and population values only, so the merged dataset retains the canonical field name `Fnum` rather than generated suffixes such as `Fnum_x` or `Fnum_y`.
 
-**Repository data paths (portable).** Neither script hard-codes your machine username, drive letter, or clone location (e.g. no `D:\OneDrive\...` paths). Both scripts set `base_dir` to the folder containing the `.py` file (`os.path.dirname(os.path.abspath(__file__))`), then build paths with `os.path.join(base_dir, "input", ...)`, `demo/`, `ready_idf/`, and `result/`. As long as you run the scripts from a normal clone of this repository, these folders resolve correctly on any OS.
+## Python environment
 
-**EnergyPlus install paths (machine-specific).** EnergyPlus itself is **not** shipped in this repo. `1_GIS2IDF.py` and `2_BatchSimulation.py` still use the **default Windows install layout** for version 23.1, for example `C:\EnergyPlusV23-1-0\Energy+.idd` and related files under `C:\EnergyPlusV{version}\`. If your installation is elsewhere—or you are on Linux or macOS—you must edit those EnergyPlus paths in the scripts (search for `EnergyPlusV` / `iddfile`) before running.
+Python 3.10 or later is recommended.
+
+Install the required packages from the repository root:
+
+```bash
+python -m venv .venv
+```
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Linux or macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Then install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+The principal dependencies are:
+
+```text
+numpy>=1.24,<3
+pandas>=1.5,<3
+pythermalcomfort==3.7.1
+openpyxl>=3.1
+XlsxWriter>=3.1
+```
+
+## Running the Beijing reproduction
+
+### 1. Download the EnergyPlus simulation outputs
+
+Download the Beijing archive from Zenodo and extract its `IndoorEnv`, `Energy`, and `Capacity` directories into:
+
+```text
+code/data/energyplus_outputs/
+```
+
+### 2. Confirm the supporting data
+
+The Beijing lookup tables should remain under:
+
+```text
+code/data/supporting_data/ClusterMap/
+code/data/supporting_data/Population/
+```
+
+### 3. Run the complete pipeline
+
+From the repository root, execute:
+
+```bash
+python code/run_all.py
+```
+
+The runner executes the three stages in sequence. A nonzero return code from any stage stops the workflow immediately.
+
+## Step-by-step execution
+
+### Step 1 — SET and sleep-period thermal discomfort
+
+```bash
+python code/code/step1_compute_set.py
+```
+
+Principal operations:
+
+1. read hourly indoor-environment outputs;
+2. reconstruct indoor relative humidity from dry-bulb temperature, humidity ratio, and atmospheric pressure;
+3. calculate hourly SET using `pythermalcomfort` 3.7.1;
+4. identify intervals with SET greater than 30 °C during the defined sleep period;
+5. aggregate floor-level results to buildings and population-weighted city-level indicators.
+
+Principal outputs:
+
+```text
+code/output/set_calculations/summary_uncomfortable_hours.csv
+code/output/per_capita_hours/per_capita_hours_summary.csv
+```
+
+### Step 2 — Total and per-capita analysis-ready pivot tables
+
+```bash
+python code/code/step2_pivot_tables.py
+```
+
+Principal outputs:
+
+```text
+code/output/pivot_tables/total_uncomfortable_hours_pivot.xlsx
+code/output/pivot_tables/per_capita_hours_pivot.xlsx
+```
+
+### Step 3 — Energy, capacity, and coincident peak
+
+```bash
+python code/code/step3_energy_capacity.py
+```
+
+Principal outputs:
+
+```text
+code/output/energy_capacity/energy_capacity_summary.csv
+code/output/energy_capacity/coincident_peak_load.csv
+```
+
+## SET and sleep-period settings
+
+The released calculation uses the following fixed settings:
+
+| Parameter | Value |
+|---|---:|
+| Metabolic rate | 0.7 met |
+| Clothing and bedding insulation | 0.8 clo |
+| Indoor air velocity | 0.1 m s⁻¹ |
+| Relative-humidity upper limit | 60% |
+| Atmospheric pressure | 101,325 Pa |
+| SET discomfort threshold | 30 °C |
+| Analysis season | May–October |
+| Sleep period represented | 22:00–07:00 |
+| EnergyPlus interval-ending timestamps | 23:00, 24:00, and 01:00–07:00 |
+
+The calculation evaluates **nine hourly intervals spanning 22:00–07:00**, represented by the EnergyPlus interval-ending timestamps 23:00, 24:00, and 01:00–07:00. Across the May–October analysis season (184 days), this yields **1,656 evaluated hourly intervals per modeled floor and scenario**.
+
+The original EnergyPlus CSV files contain `24:00:00` rather than `00:00:00`; therefore, `24` is retained during the calculation. When results are exported to Excel, `24:00` may be displayed as `00:00` on the following calendar day, which is expected and does not alter the represented interval.
+
+## Cooling strategies
+
+| Strategy | Capacity assumption | Operating condition |
+|---|---|---|
+| **S1** | Fixed | Nighttime cooling at 27 °C |
+| **S2** | Fixed | All-day cooling: 32 °C during daytime and 27 °C during nighttime |
+| **S3** | Fixed | Nighttime cooling at 26 °C |
+| **S4** | Fixed | All-day cooling: 32 °C during daytime and 26 °C during nighttime |
+| **S5** | Autosized | All-day cooling: 32 °C during daytime and 26 °C during nighttime |
+
+Only S1–S5 are included in the released workflow.
+
+## Figure source data
+
+The figure directories contain the processed data and rendered panels used for manuscript inspection:
+
+| Folder | Main contents |
+|---|---|
+| `figure/figure2/` | Six-city discomfort summaries and Beijing building-level spatial source data |
+| `figure/figure3/` | AC-ownership data, external benchmark data, and processed Beijing social-sensing data |
+| `figure/figure4/` | Guangzhou–Shenzhen weather, discomfort, building-stock, and predictive-decomposition source data |
+| `figure/figure5/` | Floor-specific and hourly top-floor-discomfort source data |
+| `figure/figure6/` | Energy–comfort, capacity-density, and hourly cooling-load source data |
+
+These materials support inspection of the manuscript figures. **No figure plotting scripts are provided.**
+
+The Beijing building shapefile supports spatial inspection, whereas the executable three-stage workflow uses the ClusterMap and population lookup tables.
+
 
 ## Replication notes
 
-1. Confirm inputs under `input/` (weather, settings). For GIS, use **`input/GIS/Prototype/`** only — do not point `1_GIS2IDF.py` at the CityBuilding ZIPs or full-city layers. The default example uses `input/GIS/Prototype/320100NANJINGSHI.shp`.
-2. Install **EnergyPlus 23.1** and point the EnergyPlus paths in both scripts to your local `Energy+.idd` and install folder (see **Paths and local configuration** above).
-3. Run **`1_GIS2IDF.py`** to produce IDFs under `ready_idf/` (default output folder: `ready_idf/320100NANJINGSHI/`).
-4. Run **`2_BatchSimulation.py`** to simulate IDFs under `demo/ready_idf/` and write outputs to `demo/result/`. Pre-computed results are already under `demo/result/` for comparison.
-5. Compare outputs with the paper and the online resources above.
+Before running the workflow, confirm that:
+
+1. the Beijing `IndoorEnv`, `Energy`, and `Capacity` folders have been extracted from the Zenodo archive;
+2. the exact strategy, city, and scenario directory names shown above remain unchanged;
+3. the three EnergyPlus output types refer to the same Beijing building archetypes;
+4. the ClusterMap and population files contain compatible building identifiers;
+5. the canonical floor-count field is named `Fnum`.
+
+The `code/output/` directory is generated automatically. No precomputed output files are required to run the released Beijing pipeline.
+
+## Reproducibility boundary
+
+This repository is a reproducible post-processing and source-data release for the Beijing case. It provides the three-stage calculation code, Beijing lookup inputs, Beijing spatial source data, and processed source data supporting the six-city manuscript figures. The upstream GIS-to-IDF and EnergyPlus simulation stages are outside the released executable workflow.
 
 ## Status
 
-- Workflow scripts, sample GIS inputs, weather files, full-city ready IDFs, and a self-contained `demo/` package are included at the repository root.
-- Full national-scale extensions and additional QC utilities may be added as the release is finalized.
+- The three-stage Beijing post-processing pipeline is included.
+- Beijing building and population lookup tables are included.
+- Processed source data and rendered manuscript panels are included.
+- The Beijing EnergyPlus simulation-output package will be archived separately on Zenodo.
+- The Zenodo DOI should be inserted before the repository is made public.
 
-## Post-process: scale-up to city-wide buildings
+## Citation
 
-`1_GIS2IDF.py` builds **prototype** IDFs from `input/GIS/Prototype/` (one file per **`bh`**, e.g. `320100NANJINGSHI_5.idf`). **City-wide scale-up** is described in the manuscript; this repository provides the GIS and IDF data used in that step, not a separate scale-up script.
-
-| Data | Role |
-|------|------|
-| **CityBuilding** (unzip `input/GIS/CityBuilding/*.zip`, read `.shp`) | All individual building footprints in the city. |
-| **Prototype** (`input/GIS/Prototype/*.shp`) | Prototype buildings; source of geometry and IDF index **`bh`**. |
-| **`BuildID`** | Join key between Prototype and CityBuilding. |
-| **`bh`** | Prototype index; matches IDF filename suffix and `1_GIS2IDF.py` output. |
-| **`LandNum`** + **`Cluster`** | Together assign each building to the correct **`proptype`** (prototype type) for mapping prototype models to individual footprints. |
+A formal citation and archived release DOI will be added when the manuscript and Zenodo record are finalized.

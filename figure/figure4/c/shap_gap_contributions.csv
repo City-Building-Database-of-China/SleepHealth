@@ -1,0 +1,5 @@
+Feature_group,Contribution_h_per_person_yr,Share_of_model_explained_gap,Share_of_observed_gap,Scenario,Model_mode,Use_sample_weight_training,Decomposition_model_fit,Bootstrap_lower_95CI,Bootstrap_upper_95CI
+Footprint / size,10.531221046249481,0.17996713132193887,0.15333896106435962,2060 SSP5-8.5,package,TRUE,all_cleaned_samples,10.009183650907566,11.089502178492452
+Vertical morphology,36.6375029817337,0.6260951395346294,0.5334572903312256,2060 SSP5-8.5,package,TRUE,all_cleaned_samples,35.28157842345568,37.99101407340775
+Compactness / envelope,7.261585912166584,0.1240926175342067,0.10573171283378986,2060 SSP5-8.5,package,TRUE,all_cleaned_samples,6.798670024027218,7.813872102729704
+Construction vintage,4.087104741576662,0.06984418165031282,0.05950994591057194,2060 SSP5-8.5,package,TRUE,all_cleaned_samples,3.754933520509447,4.4041958580630896
