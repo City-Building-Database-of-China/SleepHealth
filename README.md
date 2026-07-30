@@ -340,26 +340,19 @@ The Beijing building shapefile supports spatial inspection, whereas the executab
 
 Before running the workflow, confirm that:
 
-1. the Beijing `IndoorEnv`, `Energy`, and `Capacity` folders have been extracted from the Zenodo archive;
-2. the exact strategy, city, and scenario directory names shown above remain unchanged;
-3. the three EnergyPlus output types refer to the same Beijing building archetypes;
-4. the ClusterMap and population files contain compatible building identifiers;
+1. the Beijing `IndoorEnv`, `Energy`, and `Capacity` folders have been extracted from the Zenodo archive into `code/data/energyplus_outputs/`;
+2. the climate-condition folders and input filenames remain unchanged;
+3. the corresponding `IndoorEnv`, `Energy`, and `Capacity` files refer to the same Beijing building archetypes;
+4. the ClusterMap and Population datasets contain compatible `BuildingID` values;
 5. the canonical floor-count field is named `Fnum`.
 
-The `code/output/` directory is generated automatically. No precomputed output files are required to run the released Beijing pipeline.
+The `code/output/` directory is generated automatically during execution.
 
-## Reproducibility boundary
-
-This repository is a reproducible post-processing and source-data release for the Beijing case. It provides the three-stage calculation code, Beijing lookup inputs, Beijing spatial source data, and processed source data supporting the six-city manuscript figures. The upstream GIS-to-IDF and EnergyPlus simulation stages are outside the released executable workflow.
 
 ## Status
 
 - The three-stage Beijing post-processing pipeline is included.
-- Beijing building and population lookup tables are included.
+- Seven Beijing EPW files are included.
+- Beijing building-cluster and population datasets are included.
 - Processed source data and rendered manuscript panels are included.
-- The Beijing EnergyPlus simulation-output package will be archived separately on Zenodo.
-- The Zenodo DOI should be inserted before the repository is made public.
-
-## Citation
-
-A formal citation and archived release DOI will be added when the manuscript and Zenodo record are finalized.
+- The Beijing EnergyPlus simulation-output package will be archived on Zenodo under the reserved DOI `10.5281/zenodo.21695606`.
