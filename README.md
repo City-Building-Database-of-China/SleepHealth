@@ -37,12 +37,12 @@ Only these three computational stages are included in the public code release.
 
 The manuscript evaluates six Chinese megacities: Beijing, Shanghai, Guangzhou, Shenzhen, Wuhan, and Xiamen. Owing to data volume and redistribution constraints, the executable public reproduction is provided for **Beijing only**.
 
-The large Beijing EnergyPlus simulation-output package is distributed separately through Zenodo. Processed source data supporting the six-city manuscript figures are retained in this GitHub repository where applicable.
+The Beijing EnergyPlus simulation outputs required for the released reproduction are now included directly in this GitHub repository as compressed scenario archives. Processed source data supporting the six-city manuscript figures are retained in the same repository where applicable.
 
 | Material | Public location | Scope |
 |---|---|---|
 | Three-stage post-processing code | GitHub repository | Beijing executable reproduction |
-| EnergyPlus simulation outputs used as post-processing inputs | Zenodo archive | Beijing only |
+| EnergyPlus simulation outputs used as post-processing inputs | `code/data/energyplus_outputs/` (compressed ZIP archives) | Beijing only |
 | Building and population lookup tables | `code/data/supporting_data/` | Beijing only |
 | Beijing residential-building shapefile | `figure/figure2/c/BJ-shp/` | Beijing only; spatial inspection and source-data transparency |
 | Figure source data | `figure/figure2/`–`figure/figure6/` | Processed tables and files supporting manuscript panels |
@@ -83,7 +83,10 @@ SleepHealth/
 │   │       └── set_calculator.py
 │   ├── data/
 │   │   ├── energyplus_outputs/
-│   │   │   └── README.md
+│   │   │   ├── README.md
+│   │   │   ├── IndoorEnv/              # Seven scenario ZIP archives
+│   │   │   ├── Energy/                 # Seven scenario ZIP archives
+│   │   │   └── Capacity/               # Seven scenario ZIP archives
 │   │   └── supporting_data/
 │   │       ├── ClusterMap/
 │   │       └── Population/
@@ -102,40 +105,27 @@ The `code/output/` directory is generated automatically and is not required as a
 
 The `figure/` directory contains processed figure source data and rendered panels. It does not contain the manuscript plotting scripts.
 
-## External Beijing input archive
+## Compressed Beijing EnergyPlus inputs
 
-The EnergyPlus simulation outputs required to run the three-stage pipeline are stored separately on Zenodo because of their file size.
-
-**Zenodo record:** DOI to be inserted before public release.
-
-After downloading the archive, extract it into:
+The Beijing EnergyPlus simulation outputs required to run the three-stage pipeline are included directly in this GitHub repository under:
 
 ```text
 code/data/energyplus_outputs/
 ```
 
-The final Zenodo package must preserve the exact strategy, city, scenario, and filename structure expected by the released scripts.
+Because of GitHub file-size constraints, each climate-scenario directory is distributed as an individual ZIP archive inside `IndoorEnv/`, `Energy/`, and `Capacity/`. Before running the workflow, extract the archives **in place** so that the corresponding scenario directories are restored.
 
-### Exact directory names
-
-**Strategy directories**
-
-| Strategy | Directory name |
-|---|---|
-| S1, 2020 baseline | `S1a_2020_Evening27` |
-| S1, future scenarios | `S1b_Future_FixedCap_Evening27` |
-| S2 | `S2_Future_FixedCap_AllDay_32_27` |
-| S3 | `S3_Future_FixedCap_Evening26` |
-| S4 | `S4_Future_FixedCap_AllDay_32_26` |
-| S5 | `S5_Future_AutoSize_AllDay_32_26` |
-
-**City directory**
+For example:
 
 ```text
-bei3jing1shi4/
+code/data/energyplus_outputs/Capacity/2020.zip
+    → code/data/energyplus_outputs/Capacity/2020/
+
+code/data/energyplus_outputs/Energy/2040-SSP1-2.6.zip
+    → code/data/energyplus_outputs/Energy/2040-SSP1-2.6/
 ```
 
-**Scenario directories**
+The same seven scenario names are used under all three input categories:
 
 ```text
 2020/
@@ -147,7 +137,7 @@ bei3jing1shi4/
 2060-SSP5-8.5/
 ```
 
-The same strategy, city, and scenario hierarchy must be retained under `IndoorEnv/`, `Energy/`, and `Capacity/`. Directory names and filename suffixes must not be changed after extraction.
+Directory names and filename suffixes must not be changed after extraction. The extracted scenario folders must preserve the internal file organization expected by the released scripts.
 
 | Folder | Contents |
 |---|---|
@@ -211,13 +201,17 @@ XlsxWriter>=3.1
 
 ## Running the Beijing reproduction
 
-### 1. Download the EnergyPlus simulation outputs
+### 1. Extract the bundled EnergyPlus simulation outputs
 
-Download the Beijing archive from Zenodo and extract its `IndoorEnv`, `Energy`, and `Capacity` directories into:
+The required Beijing EnergyPlus outputs are already included in the GitHub repository as ZIP archives. Extract all seven scenario archives in each of the following directories before running the pipeline:
 
 ```text
-code/data/energyplus_outputs/
+code/data/energyplus_outputs/IndoorEnv/
+code/data/energyplus_outputs/Energy/
+code/data/energyplus_outputs/Capacity/
 ```
+
+After extraction, each directory should contain the seven scenario folders listed above.
 
 ### 2. Confirm the supporting data
 
@@ -340,7 +334,7 @@ The Beijing building shapefile supports spatial inspection, whereas the executab
 
 Before running the workflow, confirm that:
 
-1. the Beijing `IndoorEnv`, `Energy`, and `Capacity` folders have been extracted from the Zenodo archive into `code/data/energyplus_outputs/`;
+1. all scenario ZIP archives under `code/data/energyplus_outputs/IndoorEnv/`, `Energy/`, and `Capacity/` have been extracted in place;
 2. the climate-condition folders and input filenames remain unchanged;
 3. the corresponding `IndoorEnv`, `Energy`, and `Capacity` files refer to the same Beijing building archetypes;
 4. the ClusterMap and Population datasets contain compatible `BuildingID` values;
@@ -355,4 +349,4 @@ The `code/output/` directory is generated automatically during execution.
 - Seven Beijing EPW files are included.
 - Beijing building-cluster and population datasets are included.
 - Processed source data and rendered manuscript panels are included.
-- The Beijing EnergyPlus simulation-output package will be archived on Zenodo under the reserved DOI `10.5281/zenodo.21695606`.
+- The Beijing EnergyPlus simulation outputs required for the released reproduction are included in this GitHub repository as compressed scenario archives.

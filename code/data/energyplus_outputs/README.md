@@ -1,14 +1,8 @@
-# External EnergyPlus Outputs
+# Compressed EnergyPlus Outputs
 
-The raw EnergyPlus output archive is not stored in the GitHub repository because of its size.
+The Beijing EnergyPlus simulation outputs required for the released reproduction workflow are stored directly in this GitHub repository. Because of GitHub file-size constraints, each climate-scenario directory is provided as an individual ZIP archive.
 
-Download the Beijing reproduction package from the project Zenodo record and extract it into this directory:
-
-```text
-data/energyplus_outputs/
-```
-
-The extracted structure must be:
+Before running the pipeline, extract every ZIP archive **in place** inside the corresponding `IndoorEnv`, `Energy`, and `Capacity` directories. The extracted structure must be:
 
 ```text
 energyplus_outputs/
@@ -38,7 +32,9 @@ energyplus_outputs/
     └── 2060-SSP5-8.5/
 ```
 
-The same scenario-folder names must be used under `IndoorEnv`, `Energy`, and `Capacity`. Do not rename individual folders or move files between scenarios.
+For example, `Capacity/2020.zip` should be extracted so that `Capacity/2020/` is restored. Apply the same rule to all seven scenario archives under each of the three input categories.
+
+The same scenario-folder names must be used under `IndoorEnv`, `Energy`, and `Capacity`. Do not rename individual folders or move files between scenarios. After successful extraction, the ZIP files may be retained or removed locally; the released scripts read the extracted directories rather than the ZIP archives.
 
 ## Folder contents
 
@@ -55,4 +51,3 @@ IndoorEnv/2040-SSP1-2.6/bei3jing1shi4_0_1_1980_S0.csv
 Energy/2040-SSP1-2.6/bei3jing1shi4_0_1_1980_S0-meter.csv
 Capacity/2040-SSP1-2.6/bei3jing1shi4_0_1_1980_S0-table.htm
 ```
-
