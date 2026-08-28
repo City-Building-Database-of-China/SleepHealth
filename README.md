@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The data and code in this repository support the **peer review** of the manuscript submitted to *Nature Climate Change*:
+The data and code in this repository support the **peer review** of the manuscript submitted to *Nature Portfolio*:
 
 **Climate warming not only amplifies cooling demand but also undermines sleep comfort**
 
