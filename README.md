@@ -2,9 +2,11 @@
 
 ## Purpose
 
-The data and code in this repository support the **peer review** of the manuscript submitted to *Nature Portfolio*:
+The data and code in this repository support the **peer review** of the manuscript submitted to *Nature Cities*:
 
-**Climate warming not only amplifies cooling demand but also undermines sleep comfort**
+**Building-mediated heat exposure threatens urban sleep comfort in a warming climate**
+
+Corresponding authors: Meng Wang and Rui Jing. The manuscript describes the code functionality in the Methods section.
 
 The materials are provided so that reviewers and future users can inspect the numerical workflow, reproduce the released Beijing case, and examine the processed source data supporting the manuscript figures.
 
@@ -42,6 +44,7 @@ The Beijing EnergyPlus simulation outputs required for the released reproduction
 | Material | Public location | Scope |
 |---|---|---|
 | Three-stage post-processing code | GitHub repository | Beijing executable reproduction |
+| Quick demo subset | `demo/data/` | One Beijing archetype, 2020 scenario; demonstrates the workflow and does not reproduce manuscript results |
 | EnergyPlus simulation outputs used as post-processing inputs | `code/data/energyplus_outputs/` (compressed ZIP archives) | Beijing only |
 | Building and population lookup tables | `code/data/supporting_data/` | Beijing only |
 | Beijing residential-building shapefile | `figure/figure2/c/BJ-shp/` | Beijing only; spatial inspection and source-data transparency |
@@ -51,8 +54,6 @@ The Beijing EnergyPlus simulation outputs required for the released reproduction
 | National administrative-boundary shapefiles | Not distributed | Users should obtain authoritative boundary data independently |
 
 The executable supporting-data directories contain only the Beijing ClusterMap and population inputs. The Beijing residential-building shapefile is provided for spatial inspection and source-data transparency. It is not read by the released three-stage post-processing pipeline. The executable workflow instead uses the ClusterMap and population lookup tables under `code/data/supporting_data/`.
-
-Only one copy of the Beijing shapefile should be retained in the final public repository, at `figure/figure2/c/BJ-shp/`. Duplicate copies under other figure folders should be removed before release.
 
 ## Beijing building data preview
 
@@ -64,9 +65,13 @@ The image above is a preview of the released Beijing residential-building datase
 
 ```text
 SleepHealth/
+├── LICENSE
 ├── README.md
 ├── requirements.txt
 ├── beijing_buildings_preview.png
+├── demo/
+│   ├── run_demo.py
+│   └── data/                           # Small in-repository demo subset
 ├── code/
 │   ├── README.md
 │   ├── run_all.py
@@ -87,6 +92,7 @@ SleepHealth/
 │   │   │   ├── IndoorEnv/              # Seven scenario ZIP archives
 │   │   │   ├── Energy/                 # Seven scenario ZIP archives
 │   │   │   └── Capacity/               # Seven scenario ZIP archives
+│   │   ├── epw/                        # Seven Beijing EPW files
 │   │   └── supporting_data/
 │   │       ├── ClusterMap/
 │   │       └── Population/
@@ -158,6 +164,7 @@ Directory names and filename suffixes must not be changed after extraction. The 
 | `code/code/core/` | Shared calculation, city-matching, and Excel-export utilities |
 | `code/data/supporting_data/ClusterMap/` | Beijing building identifiers, prototype assignments, floor counts, and related lookup fields |
 | `code/data/supporting_data/Population/` | Beijing building-level population inputs used for population-weighted aggregation |
+| `demo/run_demo.py` | Runs the same pipeline on the small in-repository demo subset |
 
 `Fnum`, `LandNum`, and `Cluster` are read from the ClusterMap table. Population tables contribute building identifiers and population values only, so the merged dataset retains the canonical field name `Fnum` rather than generated suffixes such as `Fnum_x` or `Fnum_y`.
 
@@ -170,6 +177,8 @@ Install the required packages from the repository root:
 ```bash
 python -m venv .venv
 ```
+
+On some Windows systems, use `py -m venv .venv` if `python` is not available.
 
 Windows:
 
@@ -198,6 +207,57 @@ pythermalcomfort==3.7.1
 openpyxl>=3.1
 XlsxWriter>=3.1
 ```
+
+`pythermalcomfort` 3.7.1 also installs `scipy` and `numba`. EnergyPlus and QGIS are not required to run the released workflow. The bundled Beijing EnergyPlus archives were generated with EnergyPlus 23.2.0; that version is not a runtime dependency of this repository.
+
+### Tested environment
+
+The quick demo was executed in this environment after a clean virtual-environment installation:
+
+- Microsoft Windows 11 Pro, 64-bit (build 10.0.26200)
+- Python 3.11.6
+- numpy 2.4.6
+- pandas 2.3.3
+- pythermalcomfort 3.7.1
+- openpyxl 3.1.5
+- XlsxWriter 3.2.9
+
+The workflow is expected to work on other 64-bit Windows, macOS, and Linux systems with Python 3.10+ and the packages above. Those operating systems were not tested during this documentation update. The complete Beijing archive was not re-executed during this documentation update.
+
+### Hardware requirements
+
+No non-standard hardware is required for the released workflow. A GPU or HPC system is not needed.
+
+### Typical installation time
+
+Typical installation time: approximately 2 minutes in the tested environment (creating a virtual environment and installing `requirements.txt`). The measured elapsed time was 97 seconds.
+
+## Quick demo
+
+`demo/data/` contains a small real subset of the released Beijing files: one IndoorEnv CSV, one Energy meter CSV, and one Capacity HTML report for `bei3jing1shi4_0_1_1980_S0`, plus one matching ClusterMap row and one matching population row. Atmospheric pressure is read from the existing Beijing 2020 EPW file in `code/data/epw/`.
+
+These files demonstrate the software interface and workflow. They are not used to reproduce manuscript results or figures. No Zenodo download is required.
+
+From the repository root, after installation:
+
+```bash
+python demo/run_demo.py
+```
+
+A successful run prints `[OK] Demo completed` and writes:
+
+```text
+demo/output/set_calculations/summary_uncomfortable_hours.csv
+demo/output/per_capita_hours/per_capita_hours_summary.csv
+demo/output/pivot_tables/total_uncomfortable_hours_pivot.xlsx
+demo/output/pivot_tables/per_capita_hours_pivot.xlsx
+demo/output/energy_capacity/energy_capacity_summary.csv
+demo/output/energy_capacity/coincident_peak_load.csv
+```
+
+In the tested environment the summary file contained one `STOREY_0` row for `bei3jing1shi4_0_1_1980_S0` under `2020 Baseline` / S1. The other five cities are skipped, which is expected. Those numbers belong to this one-building subset.
+
+Typical demo runtime: approximately 20 seconds in the tested environment. The measured elapsed time was 17 seconds.
 
 ## Running the Beijing reproduction
 
@@ -281,6 +341,54 @@ code/output/energy_capacity/energy_capacity_summary.csv
 code/output/energy_capacity/coincident_peak_load.csv
 ```
 
+## Running on your own compatible data
+
+The released workflow is a research pipeline with a fixed input schema, not a general-purpose library. It can be applied to other datasets that follow the same layout and naming conventions.
+
+Place compatible files in the same relative structure, or point the pipeline to another tree.
+
+Windows (Command Prompt):
+
+```bat
+set MODEL_DATA_ROOT=path\to\your_data
+set MODEL_OUTPUT_ROOT=path\to\your_output
+set BASE_EPW=path\to\your_epw
+python code/run_all.py
+```
+
+Windows (PowerShell):
+
+```powershell
+$env:MODEL_DATA_ROOT="path\to\your_data"
+$env:MODEL_OUTPUT_ROOT="path\to\your_output"
+$env:BASE_EPW="path\to\your_epw"
+python code/run_all.py
+```
+
+macOS/Linux:
+
+```bash
+export MODEL_DATA_ROOT=/path/to/your_data
+export MODEL_OUTPUT_ROOT=/path/to/your_output
+export BASE_EPW=/path/to/your_epw
+python code/run_all.py
+```
+
+Optional overrides: `BASE_INDOOR`, `BASE_ENERGY`, `BASE_CAPACITY`, `BASE_CLUSTER`, `BASE_POP`.
+
+Required inputs:
+
+1. **IndoorEnv CSV** — hourly EnergyPlus outputs named `{city_pinyin}_{LandNum}_{Cluster}_{year}_{Sx}.csv`, stored under `{scenario}/`. Required columns include `Date/Time` (`MM/DD  HH:00:00`, retaining `24:00:00`), `Zone Air Temperature`, `Mean Radiant Temperature`, `Humidity Ratio`, `HVAC_CONDITIONEDTIME_SCHEDULE`, and `COOLING_PERIOD_SCHEDULE`.
+2. **Energy meter CSV** — companion `{id}-meter.csv` with `Electricity:Facility` and `Electricity:Building`.
+3. **Capacity HTML** — companion `{id}-table.htm` containing `Coil:Cooling:DX:SingleSpeed` and `STOREY n ... COOLING COIL` rows.
+4. **ClusterMap** — `cluster_{citycode}_{City}.xlsx` or `.csv` with `BuildingID`, `Fnum`, `Cluster`, and `LandNum`. If `landUseTyp` is present, only rows starting with `Residential` are used.
+5. **Population table** — `{citycode}_{City}_full.xlsx` or `.csv` with `BuildingID` and a population field (`Population`, `popNum_2`, or an equivalent alias).
+6. **EPW file** — one city/scenario EPW whose filename or path matches the city and scenario tokens. Step 1 uses EPW field 10 (atmospheric pressure).
+
+Recognised city prefixes include `bei3jing1shi4`. Recognised scenario folders are the seven names listed above. For 2020 files, filename suffix `S0` is treated as strategy S1. Future files use zero-based suffixes `S0`–`S4` for S1–S5 unless `FLAT_STRATEGY_INDEX_BASE` is set.
+
+Building identifiers in EnergyPlus filenames must encode `_{LandNum}_{Cluster}_` so that floor-level results can be matched to ClusterMap `Fnum`. Outputs use the same filenames as the Beijing reproduction, written under `MODEL_OUTPUT_ROOT`.
+
 ## SET and sleep-period settings
 
 The released calculation uses the following fixed settings:
@@ -296,6 +404,8 @@ The released calculation uses the following fixed settings:
 | Analysis season | May–October |
 | Sleep period represented | 22:00–07:00 |
 | EnergyPlus interval-ending timestamps | 23:00, 24:00, and 01:00–07:00 |
+
+Step 1 reads city/scenario-specific atmospheric pressure from the matching EPW file under `code/data/epw/`. The 101,325 Pa value remains in `parameters.py` as a legacy constant and is not used by the released Step 1 workflow.
 
 The calculation evaluates **nine hourly intervals spanning 22:00–07:00**, represented by the EnergyPlus interval-ending timestamps 23:00, 24:00, and 01:00–07:00. Across the May–October analysis season (184 days), this yields **1,656 evaluated hourly intervals per modeled floor and scenario**.
 
@@ -346,7 +456,12 @@ The `code/output/` directory is generated automatically during execution.
 ## Status
 
 - The three-stage Beijing post-processing pipeline is included.
+- A small in-repository demo subset is included.
 - Seven Beijing EPW files are included.
 - Beijing building-cluster and population datasets are included.
 - Processed source data and rendered manuscript panels are included.
 - The Beijing EnergyPlus simulation outputs required for the released reproduction are included in this GitHub repository as compressed scenario archives.
+
+## License
+
+MIT License
