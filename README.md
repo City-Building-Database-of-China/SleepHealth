@@ -6,7 +6,7 @@ The data and code in this repository support the **peer review** of the manuscri
 
 **Building-mediated heat exposure threatens urban sleep comfort in a warming climate**
 
-Corresponding authors: Meng Wang and Rui Jing. The manuscript describes the code functionality in the Methods section.
+The manuscript describes the code functionality in the Methods section.
 
 The materials are provided so that reviewers and future users can inspect the numerical workflow, reproduce the released Beijing case, and examine the processed source data supporting the manuscript figures.
 
