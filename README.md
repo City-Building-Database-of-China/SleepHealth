@@ -399,10 +399,11 @@ The released calculation uses the following settings and released analysis perio
 | SET discomfort threshold | 30 °C |
 | Analysis season represented by the released inputs | May–October |
 | Sleep period represented | 22:00–07:00 |
+| EnergyPlus interval-ending timestamps | 23:00, 24:00, and 01:00–07:00 |
 
 Step 1 reads city/scenario-specific atmospheric pressure from the matching EPW file under `code/data/epw/`.
 
-The released hourly simulation outputs span the May–October analysis period. The calculation evaluates **nine hourly intervals spanning 22:00–07:00**, represented by the EnergyPlus interval-ending timestamps 23:00, 24:00, and 01:00–07:00. Across the May–October analysis season (184 days), this yields **1,656 evaluated hourly intervals per modeled floor and scenario**.
+The released hourly simulation outputs span the May–October analysis period. The calculation evaluates the **22:00–07:00** sleep period using the cooling-period and HVAC-conditioned-time schedules contained in the EnergyPlus outputs.
 
 The original EnergyPlus CSV files contain `24:00:00` rather than `00:00:00`; therefore, `24` is retained during the calculation. When results are exported to Excel, `24:00` may be displayed as `00:00` on the following calendar day, which is expected and does not alter the represented interval.
 
