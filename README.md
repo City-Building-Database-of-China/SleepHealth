@@ -401,7 +401,6 @@ The released calculation uses the following settings and released analysis perio
 | SET discomfort threshold | 30 °C |
 | Analysis season represented by the released inputs | May–October |
 | Sleep period represented | 22:00–07:00 |
-| EnergyPlus interval-ending timestamps | 23:00, 24:00, and 01:00–07:00 |
 
 Step 1 reads city/scenario-specific atmospheric pressure from the matching EPW file under `code/data/epw/`.
 
