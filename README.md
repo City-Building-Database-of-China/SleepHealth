@@ -48,6 +48,7 @@ The Beijing EnergyPlus simulation outputs required for the released reproduction
 | Beijing residential-building shapefile | `figure/figure2/c/BJ-shp/` | Beijing only; spatial inspection and source-data transparency |
 | Figure source data | `figure/figure2/`–`figure/figure6/` | Processed tables and files supporting manuscript panels |
 | Rendered manuscript panels | `figure/figure2/`–`figure/figure6/` | Provided for inspection and comparison |
+
 The executable supporting-data directories contain the Beijing ClusterMap and population inputs used by the workflow. The Beijing residential-building shapefile is provided for spatial inspection and source-data transparency.
 
 ## Beijing building data preview
@@ -97,6 +98,7 @@ SleepHealth/
     │       └── BJ-shp/                  # Single released Beijing shapefile
     ├── figure3/
     ├── figure4/
+    │   └── c/                           # Guangzhou–Shenzhen morphology decomposition source data
     ├── figure5/
     │   └── b/                           # Seven compressed hourly source archives + field description
     └── figure6/
@@ -374,14 +376,14 @@ Optional overrides: `BASE_INDOOR`, `BASE_ENERGY`, `BASE_CAPACITY`, `BASE_CLUSTER
 
 Required inputs:
 
-1. **IndoorEnv CSV** — hourly EnergyPlus outputs named `{city_pinyin}_{LandNum}_{Cluster}_{year}_{Sx}.csv`, stored under `{scenario}/`. Required columns include `Date/Time` (`MM/DD  HH:00:00`, retaining `24:00:00`), `Zone Air Temperature`, `Mean Radiant Temperature`, `Humidity Ratio`, `HVAC_CONDITIONEDTIME_SCHEDULE`, and `COOLING_PERIOD_SCHEDULE`.
+1. **IndoorEnv CSV** — hourly EnergyPlus outputs named `{city_pinyin}_{LandNum}_{Cluster}_{year}_{Sx}.csv`, stored under `{scenario}/`. Here, `{year}` denotes the building vintage encoded in the archetype, while the climate scenario is given by the enclosing `{scenario}/` folder. Required columns include `Date/Time` (`MM/DD  HH:00:00`, retaining `24:00:00`), `Zone Air Temperature`, `Mean Radiant Temperature`, `Humidity Ratio`, `HVAC_CONDITIONEDTIME_SCHEDULE`, and `COOLING_PERIOD_SCHEDULE`.
 2. **Energy meter CSV** — companion `{id}-meter.csv` with `Electricity:Facility` and `Electricity:Building`.
 3. **Capacity HTML** — companion `{id}-table.htm` containing `Coil:Cooling:DX:SingleSpeed` and `STOREY n ... COOLING COIL` rows.
 4. **ClusterMap** — `cluster_{citycode}_{City}.xlsx` or `.csv` with `BuildingID`, `Fnum`, `Cluster`, and `LandNum`. If `landUseTyp` is present, only rows starting with `Residential` are used.
 5. **Population table** — `{citycode}_{City}_full.xlsx` or `.csv` with `BuildingID` and a population field (`Population`, `popNum_2`, or an equivalent alias).
 6. **EPW file** — one city/scenario EPW whose filename or path matches the city and scenario tokens. Step 1 uses EPW field 10 (atmospheric pressure).
 
-Recognised city prefixes include `bei3jing1shi4`. Recognised scenario folders are the seven names listed above. For 2020 files, filename suffix `S0` is treated as strategy S1. Future files use zero-based suffixes `S0`–`S4` for S1–S5 unless `FLAT_STRATEGY_INDEX_BASE` is set.
+The released executable inputs are provided for Beijing, while the code framework recognises city prefixes for all six study cities: `bei3jing1shi4`, `shang4hai3shi4`, `guang3zhou1shi4`, `shen1zhen4shi4`, `wu3han4shi4`, and `xia4men2shi4`. Recognised scenario folders are the seven names listed above. For 2020 files, filename suffix `S0` is treated as strategy S1. Future files use zero-based suffixes `S0`–`S4` for S1–S5 unless `FLAT_STRATEGY_INDEX_BASE` is set.
 
 Building identifiers in EnergyPlus filenames must encode `_{LandNum}_{Cluster}_` so that floor-level results can be matched to ClusterMap `Fnum`. Outputs use the same filenames as the Beijing reproduction, written under `MODEL_OUTPUT_ROOT`.
 
