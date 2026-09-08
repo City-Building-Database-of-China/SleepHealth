@@ -10,11 +10,11 @@ The manuscript describes the code functionality in the Methods section.
 
 The materials are provided so that reviewers and future users can inspect the numerical workflow, reproduce the released Beijing case, and examine the processed source data supporting the manuscript figures.
 
-This repository contains a **three-stage post-processing pipeline**. It starts from existing EnergyPlus simulation outputs and calculates Standard Effective Temperature (SET), sleep-period thermal-discomfort hours, population-weighted summaries, cooling-energy demand, installed cooling capacity, and coincident cooling peaks. It does not generate EnergyPlus models or execute EnergyPlus simulations.
+The core executable reproduction is a **three-stage post-processing pipeline**. It starts from existing EnergyPlus simulation outputs and calculates Standard Effective Temperature (SET), sleep-period thermal-discomfort hours, population-weighted summaries, cooling-energy demand, installed cooling capacity, and coincident cooling peaks. It does not generate EnergyPlus models or execute EnergyPlus simulations.
 
 ## Workflow overview
 
-The released computational workflow is:
+The released Beijing computational workflow is:
 
 ```text
 EnergyPlus simulation outputs used as post-processing inputs
@@ -33,13 +33,11 @@ Step 3: Cooling-energy, installed-capacity, and coincident-peak summaries
 | **Step 2** | Converts Step 1 outputs into analysis-ready total and per-capita pivot tables. |
 | **Step 3** | Summarizes cooling-energy use, installed capacity, valid cooling hours, and coincident peak cooling loads. |
 
-Only these three computational stages are included in the public code release.
-
 ## Data availability and public-release scope
 
-The manuscript evaluates six Chinese megacities: Beijing, Shanghai, Guangzhou, Shenzhen, Wuhan, and Xiamen. Owing to data volume and redistribution constraints, the executable public reproduction is provided for **Beijing only**.
+The manuscript evaluates six Chinese megacities: Beijing, Shanghai, Guangzhou, Shenzhen, Wuhan, and Xiamen. Owing to data volume and redistribution constraints, the executable city-scale post-processing reproduction is provided for **Beijing only**.
 
-The Beijing EnergyPlus simulation outputs required for the released reproduction are now included directly in this GitHub repository as compressed scenario archives. Processed source data supporting the six-city manuscript figures are retained in the same repository where applicable.
+The Beijing EnergyPlus simulation outputs required for the released reproduction are included directly in this GitHub repository as compressed scenario archives. Processed source data supporting the six-city manuscript figures are retained in the same repository where applicable.
 
 | Material | Public location | Scope |
 |---|---|---|
@@ -50,7 +48,7 @@ The Beijing EnergyPlus simulation outputs required for the released reproduction
 | Beijing residential-building shapefile | `figure/figure2/c/BJ-shp/` | Beijing only; spatial inspection and source-data transparency |
 | Figure source data | `figure/figure2/`–`figure/figure6/` | Processed tables and files supporting manuscript panels |
 | Rendered manuscript panels | `figure/figure2/`–`figure/figure6/` | Provided for inspection and comparison |
-| Figure plotting scripts | Not distributed | Plotting code is outside the public-release scope |
+| Figure plotting/analysis scripts | Not distributed | Figure directories provide source data and rendered panels only |
 | National administrative-boundary shapefiles | Not distributed | Users should obtain authoritative boundary data independently |
 
 The executable supporting-data directories contain only the Beijing ClusterMap and population inputs. The Beijing residential-building shapefile is provided for spatial inspection and source-data transparency. It is not read by the released three-stage post-processing pipeline. The executable workflow instead uses the ClusterMap and population lookup tables under `code/data/supporting_data/`.
@@ -73,7 +71,6 @@ SleepHealth/
 │   ├── run_demo.py
 │   └── data/                           # Small in-repository demo subset
 ├── code/
-│   ├── README.md
 │   ├── run_all.py
 │   ├── code/
 │   │   ├── step1_compute_set.py
@@ -100,16 +97,17 @@ SleepHealth/
 └── figure/
     ├── figure2/
     │   └── c/
-    │       └── BJ-shp/                 # Single released Beijing shapefile
+    │       └── BJ-shp/                  # Single released Beijing shapefile
     ├── figure3/
     ├── figure4/
     ├── figure5/
+    │   └── b/                           # Seven compressed hourly source archives + field description
     └── figure6/
 ```
 
 The `code/output/` directory is generated automatically and is not required as an input. It may be absent from a fresh clone or retained with an empty placeholder file such as `.gitkeep`.
 
-The `figure/` directory contains processed figure source data and rendered panels. It does not contain the manuscript plotting scripts.
+The `figure/` directory contains processed figure source data and rendered panels. Figure plotting and figure-specific analysis scripts are not distributed.
 
 ## Compressed Beijing EnergyPlus inputs
 
@@ -172,7 +170,7 @@ Directory names and filename suffixes must not be changed after extraction. The 
 
 Python 3.10 or later is recommended.
 
-Install the required packages from the repository root:
+Install the core Beijing workflow dependencies from the repository root:
 
 ```bash
 python -m venv .venv
@@ -198,7 +196,7 @@ Then install the dependencies:
 pip install -r requirements.txt
 ```
 
-The principal dependencies are:
+The principal core-workflow dependencies are:
 
 ```text
 numpy>=1.24,<3
@@ -209,6 +207,7 @@ XlsxWriter>=3.1
 ```
 
 `pythermalcomfort` 3.7.1 also installs `scipy` and `numba`. EnergyPlus and QGIS are not required to run the released workflow. The bundled Beijing EnergyPlus archives were generated with EnergyPlus 23.2.0; that version is not a runtime dependency of this repository.
+
 
 ### Tested environment
 
@@ -226,11 +225,11 @@ The workflow is expected to work on other 64-bit Windows, macOS, and Linux syste
 
 ### Hardware requirements
 
-No non-standard hardware is required for the released workflow. A GPU or HPC system is not needed.
+No non-standard hardware is required for the released Beijing workflow. A GPU or HPC system is not needed.
 
 ### Typical installation time
 
-Typical installation time: approximately 2 minutes in the tested environment (creating a virtual environment and installing `requirements.txt`). The measured elapsed time was 97 seconds.
+Typical installation time for the core Beijing workflow: approximately 2 minutes in the tested environment (creating a virtual environment and installing `requirements.txt`). The measured elapsed time was 97 seconds.
 
 ## Quick demo
 
@@ -391,7 +390,7 @@ Building identifiers in EnergyPlus filenames must encode `_{LandNum}_{Cluster}_`
 
 ## SET and sleep-period settings
 
-The released calculation uses the following fixed settings:
+The released calculation uses the following settings and released analysis period:
 
 | Parameter | Value |
 |---|---:|
@@ -399,15 +398,15 @@ The released calculation uses the following fixed settings:
 | Clothing and bedding insulation | 0.8 clo |
 | Indoor air velocity | 0.1 m s⁻¹ |
 | Relative-humidity upper limit | 60% |
-| Atmospheric pressure | 101,325 Pa |
+| Atmospheric pressure | City- and scenario-specific pressure read from the matching EPW file |
 | SET discomfort threshold | 30 °C |
-| Analysis season | May–October |
+| Analysis season represented by the released inputs | May–October |
 | Sleep period represented | 22:00–07:00 |
 | EnergyPlus interval-ending timestamps | 23:00, 24:00, and 01:00–07:00 |
 
 Step 1 reads city/scenario-specific atmospheric pressure from the matching EPW file under `code/data/epw/`. The 101,325 Pa value remains in `parameters.py` as a legacy constant and is not used by the released Step 1 workflow.
 
-The calculation evaluates **nine hourly intervals spanning 22:00–07:00**, represented by the EnergyPlus interval-ending timestamps 23:00, 24:00, and 01:00–07:00. Across the May–October analysis season (184 days), this yields **1,656 evaluated hourly intervals per modeled floor and scenario**.
+The released hourly simulation outputs span the May–October analysis period. The calculation evaluates **nine hourly intervals spanning 22:00–07:00**, represented by the EnergyPlus interval-ending timestamps 23:00, 24:00, and 01:00–07:00. Across the May–October analysis season (184 days), this yields **1,656 evaluated hourly intervals per modeled floor and scenario**.
 
 The original EnergyPlus CSV files contain `24:00:00` rather than `00:00:00`; therefore, `24` is retained during the calculation. When results are exported to Excel, `24:00` may be displayed as `00:00` on the following calendar day, which is expected and does not alter the represented interval.
 
@@ -423,26 +422,29 @@ The original EnergyPlus CSV files contain `24:00:00` rather than `00:00:00`; the
 
 Only S1–S5 are included in the released workflow.
 
+## Figure 4(c) source data
+
+Processed source tables supporting the Guangzhou–Shenzhen morphology-package decomposition are provided under `figure/figure4/c/`. They include the released 2020 baseline and 2060 SSP5-8.5 decomposition summaries. Figure-specific analysis and plotting scripts are not distributed.
+
 ## Figure source data
 
-The figure directories contain the processed data and rendered panels used for manuscript inspection:
+The figure directories contain processed data and rendered panels used for manuscript inspection:
 
 | Folder | Main contents |
 |---|---|
 | `figure/figure2/` | Six-city discomfort summaries and Beijing building-level spatial source data |
 | `figure/figure3/` | AC-ownership data, external benchmark data, and processed Beijing social-sensing data |
-| `figure/figure4/` | Guangzhou–Shenzhen weather, discomfort, building-stock, and predictive-decomposition source data |
-| `figure/figure5/` | Floor-specific and hourly top-floor-discomfort source data |
-| `figure/figure6/` | Energy–comfort, capacity-density, and hourly cooling-load source data |
+| `figure/figure4/` | Guangzhou-Shenzhen weather, discomfort, building-stock, and morphology-package decomposition source data |
+| `figure/figure5/` | Floor-specific processed data and seven compressed hourly source archives for top-floor/non-top-floor analysis |
+| `figure/figure6/` | Energy-comfort, capacity-density, and hourly cooling-load source data |
 
-These materials support inspection of the manuscript figures. **No figure plotting scripts are provided.**
+These materials support inspection of the manuscript figures. Figure plotting and figure-specific analysis scripts are not provided.
 
 The Beijing building shapefile supports spatial inspection, whereas the executable three-stage workflow uses the ClusterMap and population lookup tables.
 
-
 ## Replication notes
 
-Before running the workflow, confirm that:
+Before running the Beijing workflow, confirm that:
 
 1. all scenario ZIP archives under `code/data/energyplus_outputs/IndoorEnv/`, `Energy/`, and `Capacity/` have been extracted in place;
 2. the climate-condition folders and input filenames remain unchanged;
@@ -452,7 +454,6 @@ Before running the workflow, confirm that:
 
 The `code/output/` directory is generated automatically during execution.
 
-
 ## Status
 
 - The three-stage Beijing post-processing pipeline is included.
@@ -460,6 +461,8 @@ The `code/output/` directory is generated automatically during execution.
 - Seven Beijing EPW files are included.
 - Beijing building-cluster and population datasets are included.
 - Processed source data and rendered manuscript panels are included.
+- Seven compressed hourly source archives are included for Figure 5(b).
+- Figure 4(c) includes processed morphology-package decomposition source tables.
 - The Beijing EnergyPlus simulation outputs required for the released reproduction are included in this GitHub repository as compressed scenario archives.
 
 ## License
