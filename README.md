@@ -440,7 +440,7 @@ These materials support inspection of the manuscript figures.
 
 The Beijing building shapefile supports spatial inspection, whereas the executable three-stage workflow uses the ClusterMap and population lookup tables.
 
-## Replication notes.
+## Replication notes
 
 Before running the Beijing workflow, confirm that:
 
