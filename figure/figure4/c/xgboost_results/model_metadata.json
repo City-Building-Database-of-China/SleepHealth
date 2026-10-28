@@ -1,0 +1,62 @@
+{
+ "engine": "xgboost",
+ "within_city_variance_share": 0.4955617394890961,
+ "params": {
+  "n_estimators": 600,
+  "max_depth": 3,
+  "learning_rate": 0.03,
+  "subsample": 0.8,
+  "min_child_weight": 3,
+  "reg_lambda": 1.0,
+  "random_state": 42
+ },
+ "packages": {
+  "Climate": [
+   "T_night",
+   "W_night",
+   "GHI_daily_kWh"
+  ],
+  "Vertical form": [
+   "n_storey"
+  ],
+  "Footprint": [
+   "log_footprint"
+  ],
+  "Envelope compactness": [
+   "shape_coef"
+  ],
+  "Envelope era": [
+   "U_win",
+   "SHGC",
+   "U_floor"
+  ]
+ },
+ "monotone": {
+  "T_night": 1,
+  "W_night": 1,
+  "GHI_daily_kWh": 1,
+  "SHGC": 1,
+  "U_win": 0,
+  "U_floor": 0,
+  "n_storey": 0,
+  "log_footprint": 0,
+  "shape_coef": 0
+ },
+ "cv": {
+  "leave-one-prototype-out": {
+   "R2": 0.8837904812863913,
+   "MAE": 10.62049701356404,
+   "R2_popweighted": 0.818896572318617
+  },
+  "leave-one-scenario-out": {
+   "R2": 0.7706978630275114,
+   "MAE": 12.295331661663235,
+   "R2_popweighted": 0.6319114940938982
+  }
+ },
+ "excluded": [],
+ "bootstrap_replicates": {
+  "feature_importance": 100,
+  "gap_decomposition": 200
+ }
+}
